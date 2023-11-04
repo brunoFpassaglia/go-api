@@ -32,17 +32,17 @@ var userRoutes = []Route{
 		Callback: controllers.GetUsers,
 		Auth:     false,
 	}, {
-		URI:      "/users/{id}",
+		URI:      "/users/:id",
 		Metodo:   http.MethodDelete,
 		Callback: controllers.DeleteUser,
 		Auth:     false,
 	}, {
-		URI:      "/users/{id}",
+		URI:      "/users/:id",
 		Metodo:   http.MethodGet,
 		Callback: controllers.ShowUser,
 		Auth:     false,
 	}, {
-		URI:      "/users/{id}",
+		URI:      "/users/:id",
 		Metodo:   http.MethodPut,
 		Callback: controllers.UpdateUser,
 		Auth:     false,
