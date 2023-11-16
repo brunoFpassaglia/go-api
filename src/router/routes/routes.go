@@ -15,12 +15,12 @@ type Route struct {
 }
 
 func Config(r *gin.Engine) {
-	for _, route := range userRoutes {
+	for _, route := range userrorutes {
 		r.Handle(route.Metodo, route.URI, gin.WrapF(route.Callback))
 	}
 }
 
-var userRoutes = []Route{
+var userrorutes = []Route{
 	{
 		URI:      "/users",
 		Metodo:   http.MethodPost,

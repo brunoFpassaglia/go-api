@@ -15,14 +15,14 @@ var (
 )
 
 func LoadConfig() {
-	var erro error
+	var error error
 
-	if erro = godotenv.Load(); erro != nil {
-		log.Fatal(erro)
+	if error = godotenv.Load(); error != nil {
+		log.Fatal(error)
 	}
-	Port, erro = strconv.Atoi(os.Getenv("API_PORT"))
+	Port, error = strconv.Atoi(os.Getenv("API_PORT"))
 
-	if erro != nil {
+	if error != nil {
 		Port = 9000
 	}
 
