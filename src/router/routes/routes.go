@@ -10,13 +10,13 @@ import (
 type Route struct {
 	URI      string
 	Metodo   string
-	Callback func(http.ResponseWriter, *http.Request)
+	Callback gin.HandlerFunc
 	Auth     bool
 }
 
 func Config(r *gin.Engine) {
 	for _, route := range userrorutes {
-		r.Handle(route.Metodo, route.URI, gin.WrapF(route.Callback))
+		r.Handle(route.Metodo, route.URI, route.Callback)
 	}
 }
 

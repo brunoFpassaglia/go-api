@@ -8,10 +8,15 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
-func CreateUsers(w http.ResponseWriter, r *http.Request) {
+func CreateUsers(c *gin.Context) {
+	r := c.Request
+	w := c.Writer
 
 	body, error := io.ReadAll(r.Body)
 	if error != nil {
@@ -46,7 +51,9 @@ func CreateUsers(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, user)
 
 }
-func GetUsers(w http.ResponseWriter, r *http.Request) {
+func GetUsers(c *gin.Context) {
+	r := c.Request
+	w := c.Writer
 	nameOrNick := strings.ToLower(r.URL.Query().Get("user"))
 	db, error := database.Connect()
 	if error != nil {
@@ -63,15 +70,37 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, users)
 
 }
-func ShowUser(w http.ResponseWriter, r *http.Request) {
+func ShowUser(c *gin.Context) {
+	w := c.Writer
+	paramValue, exists := c.Params.Get("id")
+	id, error := strconv.ParseUint(paramValue, 10, 64)
+	if error != nil || !exists {
+		responses.Error(w, http.StatusBadRequest, error)
+	}
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+	repo := repositories.NewUserRepo(db)
+	user, error := repo.ShowUser(id)
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	responses.JSON(w, http.StatusOK, user)
 
-	w.Write([]byte("show usuarios"))
 }
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
+func UpdateUser(c *gin.Context) {
+	// r := c.Request
+	// w := c.Writer
 
-	w.Write([]byte("update usuarios"))
+	// w.Write([]byte("update usuarios"))
 }
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
+func DeleteUser(c *gin.Context) {
+	// r := c.Request
+	// w := c.Writer
 
-	w.Write([]byte("delete usuarios"))
+	// w.Write([]byte("delete usuarios"))
 }
