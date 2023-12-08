@@ -29,7 +29,7 @@ func CreateUsers(c *gin.Context) {
 		responses.Error(w, http.StatusBadRequest, error)
 		return
 	}
-	if error = user.Prepare(); error != nil {
+	if error = user.Prepare("create"); error != nil {
 		responses.Error(w, http.StatusBadRequest, error)
 		return
 	}
@@ -93,10 +93,44 @@ func ShowUser(c *gin.Context) {
 
 }
 func UpdateUser(c *gin.Context) {
-	// r := c.Request
-	// w := c.Writer
+	r := c.Request
+	w := c.Writer
+	paramValue, exists := c.Params.Get("id")
+	id, error := strconv.ParseUint(paramValue, 10, 64)
+	if error != nil || !exists {
+		responses.Error(w, http.StatusBadRequest, error)
+	}
 
-	// w.Write([]byte("update usuarios"))
+	body, error := io.ReadAll(r.Body)
+	if error != nil {
+		responses.Error(w, http.StatusUnprocessableEntity, error)
+		return
+	}
+
+	var user models.User
+	if error = json.Unmarshal(body, &user); error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+	user.ID = id
+
+	if error = user.Prepare("edit"); error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+	repo := repositories.NewUserRepo(db)
+	if error = repo.UpdateUser(user); error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	responses.JSON(w, http.StatusNoContent, nil)
 }
 func DeleteUser(c *gin.Context) {
 	// r := c.Request

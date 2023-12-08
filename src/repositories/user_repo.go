@@ -74,5 +74,24 @@ func (u users) ShowUser(id uint64) (models.User, error) {
 		}
 	}
 	return models.User{}, errors.New("Not found")
+}
 
+func (u users) UpdateUser(user models.User) error {
+	statement, error := u.db.Prepare("UPDATE USERS set NAME = ?, NICK=?, EMAIL=? where ID = ?")
+
+	if error != nil {
+		return error
+	}
+	defer statement.Close()
+
+	result, error := statement.Exec(user.Name, user.Nick, user.Email, user.ID)
+	if error != nil {
+		return error
+	}
+
+	_, error = result.RowsAffected()
+	if error != nil {
+		return error
+	}
+	return nil
 }
