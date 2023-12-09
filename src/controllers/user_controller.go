@@ -133,8 +133,25 @@ func UpdateUser(c *gin.Context) {
 	responses.JSON(w, http.StatusNoContent, nil)
 }
 func DeleteUser(c *gin.Context) {
-	// r := c.Request
-	// w := c.Writer
+	paramValue, exists := c.Params.Get("id")
+	id, error := strconv.ParseUint(paramValue, 10, 64)
+
+	if error != nil || !exists {
+		responses.Error(c.Writer, http.StatusBadRequest, error)
+	}
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(c.Writer, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+	repo := repositories.NewUserRepo(db)
+	error = repo.DeleteUser(id)
+	if error != nil {
+		responses.Error(c.Writer, http.StatusInternalServerError, error)
+		return
+	}
+	responses.JSON(c.Writer, http.StatusNoContent, nil)
 
 	// w.Write([]byte("delete usuarios"))
 }
