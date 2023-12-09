@@ -12,7 +12,7 @@ func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 
 	if data != nil {
 		if error := json.NewEncoder(w).Encode(data); error != nil {
-			log.Fatal("ma que pora")
+			log.Fatal()
 		}
 	}
 }
