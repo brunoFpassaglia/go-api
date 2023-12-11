@@ -15,12 +15,33 @@ type Route struct {
 }
 
 func Config(r *gin.Engine) {
-	for _, route := range userrorutes {
+	routes := userRoutes
+	routes = append(routes, authRoutes...)
+	for _, route := range routes {
 		r.Handle(route.Metodo, route.URI, route.Callback)
 	}
 }
 
-var userrorutes = []Route{
+var authRoutes = []Route{
+	{
+		URI:      "/login",
+		Metodo:   http.MethodPost,
+		Callback: controllers.Login,
+		Auth:     false,
+	},
+	// {
+	// 	URI:      "/login",
+	// 	Metodo:   http.MethodGet,
+	// 	Callback: controllers.CreateUsers,
+	// 	Auth:     false,
+	// }, {
+	// 	URI:      "/login",
+	// 	Metodo:   http.MethodPost,
+	// 	Callback: controllers.CreateUsers,
+	// 	Auth:     false,
+	// },
+}
+var userRoutes = []Route{
 	{
 		URI:      "/users",
 		Metodo:   http.MethodPost,

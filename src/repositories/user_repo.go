@@ -54,6 +54,27 @@ func (u users) GetUsers(query string) ([]models.User, error) {
 	return users, nil
 }
 
+func (u users) GetUserByEmail(email string) (models.User, error) {
+	result, error := u.db.Query(
+		"SELECT ID, PASSWORD FROM USERS WHERE EMAIL = ?", email,
+	)
+
+	if error != nil {
+		return models.User{}, error
+	}
+	defer result.Close()
+
+	var user models.User
+	if result.Next() {
+		if error = result.Scan(&user.ID, &user.Password); error != nil {
+			return models.User{}, error
+		} else {
+			return user, nil
+		}
+	}
+	return models.User{}, errors.New("Not found")
+}
+
 func (u users) ShowUser(id uint64) (models.User, error) {
 	result, error := u.db.Query(
 		"SELECT ID, NAME, NICK, EMAIL FROM USERS WHERE ID = ?", id,
@@ -62,6 +83,7 @@ func (u users) ShowUser(id uint64) (models.User, error) {
 	if error != nil {
 		return models.User{}, error
 	}
+	defer result.Close()
 
 	var user models.User
 	if result.Next() {
