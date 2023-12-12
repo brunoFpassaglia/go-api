@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"api/src/auth"
 	"api/src/database"
 	"api/src/models"
 	"api/src/repositories"
@@ -49,6 +50,11 @@ func Login(c *gin.Context) {
 		responses.Error(w, http.StatusUnauthorized, error)
 		return
 	}
-	responses.JSON(w, http.StatusOK, "booa malandro")
+	token, error := auth.MakeToken(user.ID)
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	responses.JSON(w, http.StatusOK, token)
 
 }

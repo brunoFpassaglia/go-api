@@ -11,6 +11,7 @@ import (
 
 var (
 	ConnectionString = ""
+	Secret           []byte
 	Port             = 0
 )
 
@@ -31,4 +32,5 @@ func LoadConfig() {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 	)
+	Secret = []byte(os.Getenv("SECRET"))
 }
