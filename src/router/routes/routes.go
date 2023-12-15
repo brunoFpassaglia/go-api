@@ -2,6 +2,7 @@ package routes
 
 import (
 	"api/src/controllers"
+	"api/src/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +11,7 @@ import (
 type Route struct {
 	URI      string
 	Metodo   string
-	Callback gin.HandlerFunc
+	Callback []gin.HandlerFunc
 	Auth     bool
 }
 
@@ -18,7 +19,7 @@ func Config(r *gin.Engine) {
 	routes := userRoutes
 	routes = append(routes, authRoutes...)
 	for _, route := range routes {
-		r.Handle(route.Metodo, route.URI, route.Callback)
+		r.Handle(route.Metodo, route.URI, append([]gin.HandlerFunc{middlewares.Log}, route.Callback...)...)
 	}
 }
 
@@ -26,7 +27,7 @@ var authRoutes = []Route{
 	{
 		URI:      "/login",
 		Metodo:   http.MethodPost,
-		Callback: controllers.Login,
+		Callback: []gin.HandlerFunc{controllers.Login},
 		Auth:     false,
 	},
 	// {
@@ -45,27 +46,27 @@ var userRoutes = []Route{
 	{
 		URI:      "/users",
 		Metodo:   http.MethodPost,
-		Callback: controllers.CreateUsers,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.CreateUsers},
 		Auth:     false,
 	}, {
 		URI:      "/users",
 		Metodo:   http.MethodGet,
-		Callback: controllers.GetUsers,
+		Callback: []gin.HandlerFunc{controllers.GetUsers},
 		Auth:     false,
 	}, {
 		URI:      "/users/:id",
 		Metodo:   http.MethodDelete,
-		Callback: controllers.DeleteUser,
+		Callback: []gin.HandlerFunc{controllers.DeleteUser},
 		Auth:     false,
 	}, {
 		URI:      "/users/:id",
 		Metodo:   http.MethodGet,
-		Callback: controllers.ShowUser,
+		Callback: []gin.HandlerFunc{controllers.ShowUser},
 		Auth:     false,
 	}, {
 		URI:      "/users/:id",
 		Metodo:   http.MethodPut,
-		Callback: controllers.UpdateUser,
+		Callback: []gin.HandlerFunc{controllers.UpdateUser},
 		Auth:     false,
 	},
 }
