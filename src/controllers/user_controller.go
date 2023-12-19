@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"api/src/auth"
 	"api/src/database"
 	"api/src/models"
 	"api/src/repositories"
 	"api/src/responses"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -101,6 +103,16 @@ func UpdateUser(c *gin.Context) {
 		responses.Error(w, http.StatusBadRequest, error)
 	}
 
+	idToken, error := auth.ExtractUserId(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+	if idToken != id {
+		responses.Error(w, http.StatusForbidden, errors.New("you cannot update another user"))
+		return
+	}
+
 	body, error := io.ReadAll(r.Body)
 	if error != nil {
 		responses.Error(w, http.StatusUnprocessableEntity, error)
@@ -133,12 +145,25 @@ func UpdateUser(c *gin.Context) {
 	responses.JSON(w, http.StatusNoContent, nil)
 }
 func DeleteUser(c *gin.Context) {
+	r := c.Request
+	w := c.Writer
 	paramValue, exists := c.Params.Get("id")
 	id, error := strconv.ParseUint(paramValue, 10, 64)
 
 	if error != nil || !exists {
 		responses.Error(c.Writer, http.StatusBadRequest, error)
 	}
+
+	idToken, error := auth.ExtractUserId(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+	if idToken != id {
+		responses.Error(w, http.StatusForbidden, errors.New("you cannot delete another user"))
+		return
+	}
+
 	db, error := database.Connect()
 	if error != nil {
 		responses.Error(c.Writer, http.StatusInternalServerError, error)

@@ -12,7 +12,6 @@ type Route struct {
 	URI      string
 	Metodo   string
 	Callback []gin.HandlerFunc
-	Auth     bool
 }
 
 func Config(r *gin.Engine) {
@@ -28,45 +27,28 @@ var authRoutes = []Route{
 		URI:      "/login",
 		Metodo:   http.MethodPost,
 		Callback: []gin.HandlerFunc{controllers.Login},
-		Auth:     false,
 	},
-	// {
-	// 	URI:      "/login",
-	// 	Metodo:   http.MethodGet,
-	// 	Callback: controllers.CreateUsers,
-	// 	Auth:     false,
-	// }, {
-	// 	URI:      "/login",
-	// 	Metodo:   http.MethodPost,
-	// 	Callback: controllers.CreateUsers,
-	// 	Auth:     false,
-	// },
 }
 var userRoutes = []Route{
 	{
 		URI:      "/users",
 		Metodo:   http.MethodPost,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.CreateUsers},
-		Auth:     false,
 	}, {
 		URI:      "/users",
 		Metodo:   http.MethodGet,
-		Callback: []gin.HandlerFunc{controllers.GetUsers},
-		Auth:     false,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.GetUsers},
 	}, {
 		URI:      "/users/:id",
 		Metodo:   http.MethodDelete,
-		Callback: []gin.HandlerFunc{controllers.DeleteUser},
-		Auth:     false,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.DeleteUser},
 	}, {
 		URI:      "/users/:id",
 		Metodo:   http.MethodGet,
-		Callback: []gin.HandlerFunc{controllers.ShowUser},
-		Auth:     false,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.ShowUser},
 	}, {
 		URI:      "/users/:id",
 		Metodo:   http.MethodPut,
-		Callback: []gin.HandlerFunc{controllers.UpdateUser},
-		Auth:     false,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.UpdateUser},
 	},
 }
