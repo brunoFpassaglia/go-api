@@ -101,6 +101,7 @@ func UpdateUser(c *gin.Context) {
 	id, error := strconv.ParseUint(paramValue, 10, 64)
 	if error != nil || !exists {
 		responses.Error(w, http.StatusBadRequest, error)
+		return
 	}
 
 	idToken, error := auth.ExtractUserId(r)

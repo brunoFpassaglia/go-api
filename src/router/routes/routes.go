@@ -15,10 +15,15 @@ type Route struct {
 }
 
 func Config(r *gin.Engine) {
-	routes := userRoutes
-	routes = append(routes, authRoutes...)
-	for _, route := range routes {
-		r.Handle(route.Metodo, route.URI, append([]gin.HandlerFunc{middlewares.Log}, route.Callback...)...)
+	routes := [...][]Route{
+		authRoutes,
+		userRoutes,
+		followRoutes,
+	}
+	for _, routeGroup := range routes {
+		for _, route := range routeGroup {
+			r.Handle(route.Metodo, route.URI, append([]gin.HandlerFunc{middlewares.Log}, route.Callback...)...)
+		}
 	}
 }
 
@@ -50,5 +55,17 @@ var userRoutes = []Route{
 		URI:      "/users/:id",
 		Metodo:   http.MethodPut,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.UpdateUser},
+	},
+}
+
+var followRoutes = []Route{
+	{
+		URI:      "/users/:id/follow",
+		Metodo:   http.MethodPost,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.FollowUser},
+	}, {
+		URI:      "/users/:id/unfollow",
+		Metodo:   http.MethodPost,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.UnFollowUser},
 	},
 }

@@ -121,6 +121,9 @@ func (u users) DeleteUser(id uint64) error {
 	statement, error := u.db.Prepare(
 		"DELETE FROM USERS WHERE ID = ?",
 	)
+	if error != nil {
+		return error
+	}
 	defer statement.Close()
 	result, error := statement.Exec(id)
 	if error != nil {
