@@ -47,6 +47,24 @@ func (f followers) Unfollow(follower, followee uint64) error {
 	return nil
 
 }
-func (f followers) GetFollowers(users models.User) []models.User {
-	return nil
+func (f followers) GetFollowers(userId uint64) ([]models.User, error) {
+	result, error := f.db.Query(`
+		SELECT U.NAME, U.NICK, U.EMAIL, U.CREATED_AT 
+			FROM USERS U JOIN FOLLOWERS F ON U.ID = F.FOLLOWER_ID
+			WHERE F.USER_ID = ?
+	`, userId)
+	if error != nil {
+		return nil, error
+	}
+	defer result.Close()
+
+	users := []models.User{}
+	for result.Next() {
+		var user models.User
+		if error = result.Scan(&user.Name, &user.Nick, &user.Email, &user.CreatedAt); error != nil {
+			return nil, error
+		}
+		users = append(users, user)
+	}
+	return users, nil
 }

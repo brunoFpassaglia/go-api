@@ -74,3 +74,26 @@ func UnFollowUser(c *gin.Context) {
 	}
 	responses.JSON(c.Writer, http.StatusNoContent, nil)
 }
+
+func GetFollowers(c *gin.Context) {
+	paramValue, exists := c.Params.Get("id")
+	userId, error := strconv.ParseUint(paramValue, 10, 64)
+	if error != nil || !exists {
+		responses.Error(c.Writer, http.StatusBadRequest, error)
+		return
+	}
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(c.Writer, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+	repo := repositories.NewFollowerRepo(db)
+	followers, error := repo.GetFollowers(userId)
+	if error != nil {
+		responses.Error(c.Writer, http.StatusInternalServerError, error)
+		return
+	}
+	responses.JSON(c.Writer, http.StatusOK, followers)
+
+}

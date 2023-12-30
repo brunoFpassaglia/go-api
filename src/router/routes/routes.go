@@ -10,7 +10,7 @@ import (
 
 type Route struct {
 	URI      string
-	Metodo   string
+	Method   string
 	Callback []gin.HandlerFunc
 }
 
@@ -22,7 +22,7 @@ func Config(r *gin.Engine) {
 	}
 	for _, routeGroup := range routes {
 		for _, route := range routeGroup {
-			r.Handle(route.Metodo, route.URI, append([]gin.HandlerFunc{middlewares.Log}, route.Callback...)...)
+			r.Handle(route.Method, route.URI, append([]gin.HandlerFunc{middlewares.Log}, route.Callback...)...)
 		}
 	}
 }
@@ -30,30 +30,30 @@ func Config(r *gin.Engine) {
 var authRoutes = []Route{
 	{
 		URI:      "/login",
-		Metodo:   http.MethodPost,
+		Method:   http.MethodPost,
 		Callback: []gin.HandlerFunc{controllers.Login},
 	},
 }
 var userRoutes = []Route{
 	{
 		URI:      "/users",
-		Metodo:   http.MethodPost,
+		Method:   http.MethodPost,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.CreateUsers},
 	}, {
 		URI:      "/users",
-		Metodo:   http.MethodGet,
+		Method:   http.MethodGet,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.GetUsers},
 	}, {
 		URI:      "/users/:id",
-		Metodo:   http.MethodDelete,
+		Method:   http.MethodDelete,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.DeleteUser},
 	}, {
 		URI:      "/users/:id",
-		Metodo:   http.MethodGet,
+		Method:   http.MethodGet,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.ShowUser},
 	}, {
 		URI:      "/users/:id",
-		Metodo:   http.MethodPut,
+		Method:   http.MethodPut,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.UpdateUser},
 	},
 }
@@ -61,11 +61,15 @@ var userRoutes = []Route{
 var followRoutes = []Route{
 	{
 		URI:      "/users/:id/follow",
-		Metodo:   http.MethodPost,
+		Method:   http.MethodPost,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.FollowUser},
 	}, {
 		URI:      "/users/:id/unfollow",
-		Metodo:   http.MethodPost,
+		Method:   http.MethodPost,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.UnFollowUser},
+	}, {
+		URI:      "/users/:id/followers",
+		Method:   http.MethodGet,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.GetFollowers},
 	},
 }
