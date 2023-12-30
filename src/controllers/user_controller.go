@@ -78,6 +78,7 @@ func ShowUser(c *gin.Context) {
 	id, error := strconv.ParseUint(paramValue, 10, 64)
 	if error != nil || !exists {
 		responses.Error(w, http.StatusBadRequest, error)
+		return
 	}
 	db, error := database.Connect()
 	if error != nil {

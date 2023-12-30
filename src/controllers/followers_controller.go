@@ -97,3 +97,23 @@ func GetFollowers(c *gin.Context) {
 	responses.JSON(c.Writer, http.StatusOK, followers)
 
 }
+func GetFollowing(c *gin.Context) {
+	userId, error := auth.ExtractUserId(c.Request)
+	if error != nil {
+		responses.Error(c.Writer, http.StatusBadRequest, error)
+		return
+	}
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(c.Writer, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+	repo := repositories.NewFollowerRepo(db)
+	followers, error := repo.GetFollowing(userId)
+	if error != nil {
+		responses.Error(c.Writer, http.StatusInternalServerError, error)
+		return
+	}
+	responses.JSON(c.Writer, http.StatusOK, followers)
+}

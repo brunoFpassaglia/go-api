@@ -63,13 +63,20 @@ var followRoutes = []Route{
 		URI:      "/users/:id/follow",
 		Method:   http.MethodPost,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.FollowUser},
-	}, {
+	},
+	{
 		URI:      "/users/:id/unfollow",
 		Method:   http.MethodPost,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.UnFollowUser},
-	}, {
+	},
+	{
 		URI:      "/users/:id/followers",
 		Method:   http.MethodGet,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.GetFollowers},
+	},
+	{
+		URI:      "/following",
+		Method:   http.MethodGet,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.GetFollowing},
 	},
 }
