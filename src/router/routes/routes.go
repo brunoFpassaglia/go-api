@@ -39,11 +39,18 @@ var userRoutes = []Route{
 		URI:      "/users",
 		Method:   http.MethodPost,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.CreateUsers},
-	}, {
+	},
+	{
+		URI:      "/users/:id/updatepassword",
+		Method:   http.MethodPost,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.UpdatePassword},
+	},
+	{
 		URI:      "/users",
 		Method:   http.MethodGet,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.GetUsers},
-	}, {
+	},
+	{
 		URI:      "/users/:id",
 		Method:   http.MethodDelete,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.DeleteUser},
@@ -51,7 +58,8 @@ var userRoutes = []Route{
 		URI:      "/users/:id",
 		Method:   http.MethodGet,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.ShowUser},
-	}, {
+	},
+	{
 		URI:      "/users/:id",
 		Method:   http.MethodPut,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.UpdateUser},

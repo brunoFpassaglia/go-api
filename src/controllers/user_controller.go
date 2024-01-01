@@ -6,6 +6,7 @@ import (
 	"api/src/models"
 	"api/src/repositories"
 	"api/src/responses"
+	"api/src/security"
 	"encoding/json"
 	"errors"
 	"io"
@@ -181,4 +182,61 @@ func DeleteUser(c *gin.Context) {
 	responses.JSON(c.Writer, http.StatusNoContent, nil)
 
 	// w.Write([]byte("delete usuarios"))
+}
+
+func UpdatePassword(c *gin.Context) {
+	r := c.Request
+	w := c.Writer
+	paramValue, exists := c.Params.Get("id")
+	id, error := strconv.ParseUint(paramValue, 10, 64)
+
+	if error != nil || !exists {
+		responses.Error(c.Writer, http.StatusBadRequest, error)
+	}
+
+	idToken, error := auth.ExtractUserId(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+	if idToken != id {
+		responses.Error(w, http.StatusForbidden, errors.New("you cannot update another users password"))
+		return
+	}
+
+	body, error := io.ReadAll(r.Body)
+	var password models.Password
+	if error = json.Unmarshal(body, &password); error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(c.Writer, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+	repo := repositories.NewUserRepo(db)
+	oldPassword, error := repo.GetPassword(idToken)
+	if error != nil {
+		responses.Error(c.Writer, http.StatusInternalServerError, error)
+		return
+	}
+
+	if error = security.CheckPasswd(password.Old, oldPassword); error != nil {
+		responses.Error(c.Writer, http.StatusUnauthorized, error)
+		return
+	}
+	newPassword, error := security.Hash(password.New)
+	if error != nil {
+		responses.Error(c.Writer, http.StatusInternalServerError, error)
+		return
+	}
+	error = repo.UpdatePassword(id, string(newPassword))
+	if error != nil {
+		responses.Error(c.Writer, http.StatusInternalServerError, error)
+		return
+	}
+	responses.JSON(c.Writer, http.StatusNoContent, nil)
 }
