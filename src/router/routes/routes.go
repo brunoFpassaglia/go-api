@@ -19,6 +19,7 @@ func Config(r *gin.Engine) {
 		authRoutes,
 		userRoutes,
 		followRoutes,
+		postRoutes,
 	}
 	for _, routeGroup := range routes {
 		for _, route := range routeGroup {
@@ -86,5 +87,33 @@ var followRoutes = []Route{
 		URI:      "/following",
 		Method:   http.MethodGet,
 		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.GetFollowing},
+	},
+}
+
+var postRoutes = []Route{
+	{
+		URI:      "/posts",
+		Method:   http.MethodGet,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.GetPosts},
+	},
+	{
+		URI:      "/posts",
+		Method:   http.MethodPost,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.CreatePost},
+	},
+	{
+		URI:      "/posts/:id",
+		Method:   http.MethodGet,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.ShowPost},
+	},
+	{
+		URI:      "/posts/:id",
+		Method:   http.MethodPut,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.UpdatePost},
+	},
+	{
+		URI:      "/posts/:id",
+		Method:   http.MethodDelete,
+		Callback: []gin.HandlerFunc{middlewares.Auth, controllers.DeletePost},
 	},
 }
