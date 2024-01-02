@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -52,8 +53,28 @@ func CreatePost(c *gin.Context) {
 	}
 
 	responses.JSON(w, http.StatusCreated, post)
-
 }
-func ShowPost(c *gin.Context)   {}
+func ShowPost(c *gin.Context) {
+	w := c.Writer
+	paramValue, exists := c.Params.Get("id")
+	postId, error := strconv.ParseUint(paramValue, 10, 64)
+	if error != nil || !exists {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+	repo := repositories.NewPostRepo(db)
+	post, error := repo.ShowPost(postId)
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	responses.JSON(w, http.StatusOK, post)
+}
 func UpdatePost(c *gin.Context) {}
 func DeletePost(c *gin.Context) {}
