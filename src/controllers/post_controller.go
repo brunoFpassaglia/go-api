@@ -14,7 +14,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetPosts(c *gin.Context) {}
+func GetPosts(c *gin.Context) {
+	r := c.Request
+	w := c.Writer
+
+	idToken, error := auth.ExtractUserId(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+
+	repo := repositories.NewPostRepo(db)
+	posts, error := repo.GetPosts(idToken)
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	responses.JSON(w, http.StatusOK, posts)
+}
 func CreatePost(c *gin.Context) {
 	r := c.Request
 	w := c.Writer
